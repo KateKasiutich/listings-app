@@ -1,0 +1,44 @@
+name: Testing "UsersService" service
+version: "1"
+testcases:
+    - name: Initialize database fixtures
+      steps:
+        - type: dbfixtures
+          database: mssql
+          dsn: "{{.mssql_dsn}}"
+          migrations: ../../user-service/migrations
+          folder: ../../user-service/dbfixtures
+     
+    - name: Try to retrieve data about user 1
+      steps:
+        - type: http
+          method: GET
+          url: "{{.service_url}}/api/v1/users/1"
+          assertions:
+            - result.statuscode ShouldEqual 200
+            - result.bodyjson.id ShouldEqual 1
+            - result.bodyjson.email ShouldEqual test@gmail.com
+            - result.bodyjson.password ShouldEqual 7777
+     
+    - name: Try to update the email of user 1
+      steps:
+        # Perform the update
+        - type: http
+          method: PATCH
+          url: "{{.service_url}}/api/v1/users/1"
+          body: |
+            {
+              "email": "test1@gmail.com"
+            }
+          assertions:
+            - result.statuscode ShouldEqual 200
+ 
+        # Check that the email was correctly updated
+        - type: http
+          method: GET
+          url: "{{.service_url}}/api/v1/users/1"
+          assertions:
+            - result.statuscode ShouldEqual 200
+            - result.bodyjson.id ShouldEqual 1
+            - result.bodyjson.email ShouldEqual test1@gmail.com
+            - result.bodyjson.password ShouldEqual 7777

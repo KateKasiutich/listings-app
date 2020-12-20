@@ -1,0 +1,44 @@
+name: Testing "ListinsService" service
+version: "1"
+testcases:
+    - name: Initialize database fixtures
+      steps:
+        - type: dbfixtures
+          database: mssql
+          dsn: "{{.mssql_dsn}}"
+          migrations: ../../user-service/migrations
+          folder: ../../user-service/dbfixtures
+     
+    - name: Try to retrieve data about listing 1
+      steps:
+        - type: http
+          method: GET
+          url: "{{.service_url}}/api/v1/listings/1"
+          assertions:
+            - result.statuscode ShouldEqual 200
+            - result.bodyjson.id ShouldEqual 1
+            - result.bodyjson.description ShouldEqual new description
+            - result.bodyjson.title ShouldEqual new title
+     
+    - name: Try to update the description of listing 1
+      steps:
+        # Perform the update
+        - type: http
+          method: PATCH
+          url: "{{.service_url}}/api/v1/listing/1"
+          body: |
+            {
+              "description": "updated description"
+            }
+          assertions:
+            - result.statuscode ShouldEqual 200
+ 
+        # Check that the description was correctly updated
+        - type: http
+          method: GET
+          url: "{{.service_url}}/api/v1/listing/1"
+          assertions:
+            - result.statuscode ShouldEqual 200
+            - result.bodyjson.id ShouldEqual 1
+            - result.bodyjson.description ShouldEqual updated description
+            - result.bodyjson.title ShouldEqual new title
