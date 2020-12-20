@@ -9,7 +9,8 @@
     "db:migrate": "sequelize db:migrate",
     "db:migrate:undo": "sequelize db:migrate:undo",
     "linkall": "yarn link node-deploy",
-    "watch": "babel-watch -L src/index.js"
+    "watch": "babel-watch -L src/index.js",
+    "test": "jest"
   },
   "devDependencies": {
     "babel-watch": "^7.0.0",
