@@ -9,4 +9,3 @@ Given the User has entered an email
 Given the User has enterd a password
 When the Users press "Login"
 Then Users is not logged in
-
